@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>QBReader M3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --md-sys-color-surface: #1C1B1F;
+            --md-sys-color-on-surface: #E6E1E5;
+            --md-sys-color-primary: #D0BCFF;
+            --md-sys-color-on-primary: #381E72;
+            --md-sys-color-secondary-container: #4A4458;
+            --md-sys-color-on-secondary-container: #E8DEF8;
+            --md-sys-color-surface-variant: #49454F;
+        }
+
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            margin: 0;
+            padding: 0;
+            background-color: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            font-family: 'Roboto', sans-serif;
+            overflow: hidden;
+            position: fixed; /* Prevents unwanted bounce/scroll on iOS */
+            width: 100%;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            height: 100%;
+            width: 100%;
+        }
+
+        .m3-card {
+            background-color: var(--md-sys-color-surface-variant);
+            border-radius: 16px;
+        }
+
+        .m3-btn-primary {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            border-radius: 100px;
+            font-weight: 500;
+        }
+
+        .m3-btn-tonal {
+            background-color: var(--md-sys-color-secondary-container);
+            color: var(--md-sys-color-on-secondary-container);
+            border-radius: 100px;
+        }
+
+        .question-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            letter-spacing: 0.25px;
+        }
+
+        .chip-active {
+            background-color: var(--md-sys-color-primary) !important;
+            color: var(--md-sys-color-on-primary) !important;
+        }
+
+        .loader {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--md-sys-color-on-primary);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hide scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .settings-transition {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-grid">
+        <!-- HEADER -->
+        <header class="px-6 py-4 flex items-center justify-between border-b border-white/5 shrink-0">
+            <h1 class="text-lg font-medium tracking-tight">QBReader</h1>
+            <button id="settingsBtn" class="p-2 rounded-full hover:bg-white/10 active:bg-white/20 transition-colors">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main id="scrollContainer" class="overflow-y-auto no-scrollbar px-6 py-4 flex flex-col">
+            <div id="metaInfo" class="text-[10px] font-bold uppercase tracking-[0.1em] text-white/40 mb-3">
+                Ready to play
+            </div>
+
+            <div id="questionBody" class="question-text opacity-90">
+                Click "Next Question" to load a tossup. Filters are available in the top-right settings menu.
+            </div>
+
+            <div id="answerCard" class="hidden mt-6 p-4 m3-card border-l-4 border-[#D0BCFF]">
+                <div class="text-[9px] font-black text-[#D0BCFF] uppercase mb-1 tracking-widest">Answer</div>
+                <div id="answerText" class="text-sm italic leading-relaxed"></div>
+            </div>
+        </main>
+
+        <!-- FOOTER CONTROLS -->
+        <footer class="p-6 bg-[#1C1B1F] border-t border-white/5 flex gap-3 shrink-0 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+            <button id="revealBtn" class="flex-1 py-4 m3-btn-tonal text-sm font-semibold disabled:opacity-20" disabled>
+                Reveal
+            </button>
+            <button id="nextBtn" class="flex-[2] py-4 m3-btn-primary text-sm font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform">
+                <span id="loader" class="loader hidden"></span>
+                <span id="nextBtnLabel">Next Question</span>
+            </button>
+        </footer>
+    </div>
+
+    <!-- SETTINGS OVERLAY -->
+    <div id="settingsOverlay" class="fixed inset-0 bg-black/60 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="settingsPanel" class="absolute bottom-0 left-0 right-0 bg-[#1C1B1F] rounded-t-[28px] p-8 transform translate-y-full settings-transition max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-xl font-medium">Filters</h2>
+                <button id="closeSettings" class="text-sm font-bold text-[#D0BCFF] uppercase tracking-wider p-2">Done</button>
+            </div>
+
+            <div class="space-y-8">
+                <div>
+                    <label class="text-xs font-bold text-white/50 uppercase tracking-widest block mb-4">Difficulty Range (1-10)</label>
+                    <div class="flex items-center gap-4">
+                        <input type="number" id="minDiff" value="1" min="1" max="10" class="flex-1 bg-white/5 border border-white/10 rounded-xl p-4 text-center text-sm focus:border-[#D0BCFF] outline-none">
+                        <span class="text-white/20">—</span>
+                        <input type="number" id="maxDiff" value="10" min="1" max="10" class="flex-1 bg-white/5 border border-white/10 rounded-xl p-4 text-center text-sm focus:border-[#D0BCFF] outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-white/50 uppercase tracking-widest block mb-4">Categories</label>
+                    <div id="categoryGrid" class="grid grid-cols-2 gap-2 pb-8"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const categories = ["Literature", "History", "Science", "Fine Arts", "Religion", "Mythology", "Philosophy", "Social Science", "Current Events", "Geography", "Other Academic", "Trash"];
+        let selectedCategories = [...categories];
+        let isLoading = false;
+
+        const ui = {
+            nextBtn: document.getElementById('nextBtn'),
+            nextBtnLabel: document.getElementById('nextBtnLabel'),
+            revealBtn: document.getElementById('revealBtn'),
+            loader: document.getElementById('loader'),
+            questionBody: document.getElementById('questionBody'),
+            answerCard: document.getElementById('answerCard'),
+            answerText: document.getElementById('answerText'),
+            metaInfo: document.getElementById('metaInfo'),
+            settingsBtn: document.getElementById('settingsBtn'),
+            settingsOverlay: document.getElementById('settingsOverlay'),
+            settingsPanel: document.getElementById('settingsPanel'),
+            closeSettings: document.getElementById('closeSettings'),
+            categoryGrid: document.getElementById('categoryGrid'),
+            minDiff: document.getElementById('minDiff'),
+            maxDiff: document.getElementById('maxDiff'),
+            scrollContainer: document.getElementById('scrollContainer')
+        };
+
+        function init() {
+            // Build category chips
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'py-3 px-2 m3-btn-tonal text-[11px] font-medium chip-active transition-all truncate text-center';
+                btn.textContent = cat;
+                btn.onclick = () => {
+                    if (selectedCategories.includes(cat)) {
+                        selectedCategories = selectedCategories.filter(c => c !== cat);
+                        btn.classList.remove('chip-active');
+                    } else {
+                        selectedCategories.push(cat);
+                        btn.classList.add('chip-active');
+                    }
+                };
+                ui.categoryGrid.appendChild(btn);
+            });
+
+            // Settings Toggle Logic
+            const openSettings = () => {
+                ui.settingsOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                ui.settingsPanel.classList.remove('translate-y-full');
+            };
+            
+            const closeSettings = () => {
+                ui.settingsOverlay.classList.add('opacity-0', 'pointer-events-none');
+                ui.settingsPanel.classList.add('translate-y-full');
+            };
+
+            ui.settingsBtn.onclick = openSettings;
+            ui.closeSettings.onclick = closeSettings;
+            ui.settingsOverlay.onclick = (e) => { if(e.target === ui.settingsOverlay) closeSettings(); };
+
+            ui.nextBtn.onclick = fetchTossup;
+            ui.revealBtn.onclick = revealAnswer;
+        }
+
+        async function fetchTossup() {
+            if (isLoading) return;
+            isLoading = true;
+            ui.nextBtnLabel.textContent = "Loading...";
+            ui.loader.classList.remove('hidden');
+            ui.answerCard.classList.add('hidden');
+            ui.revealBtn.disabled = true;
+            ui.questionBody.style.opacity = '0.3';
+
+            const params = new URLSearchParams({
+                questionType: 'tossup',
+                minDifficulty: ui.minDiff.value || 1,
+                maxDifficulty: ui.maxDiff.value || 10
+            });
+            selectedCategories.forEach(c => params.append('categories', c));
+
+            try {
+                const res = await fetch(`https://www.qbreader.org/api/random-tossup?${params.toString()}`);
+                const data = await res.json();
+                
+                if (data.tossups && data.tossups.length > 0) {
+                    const t = data.tossups[0];
+                    ui.questionBody.innerHTML = t.question;
+                    ui.answerText.innerHTML = t.answer;
+                    ui.metaInfo.textContent = `${t.set.name} • Packet ${t.packet.number} • ${t.category}`;
+                    ui.revealBtn.disabled = false;
+                    ui.scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    ui.questionBody.textContent = "No questions found matching your filters.";
+                }
+            } catch (err) {
+                ui.questionBody.textContent = "Error reaching QBReader API. Check your connection.";
+            } finally {
+                isLoading = false;
+                ui.nextBtnLabel.textContent = "Next Question";
+                ui.loader.classList.add('hidden');
+                ui.questionBody.style.opacity = '1';
+            }
+        }
+
+        function revealAnswer() {
+            ui.answerCard.classList.remove('hidden');
+            ui.revealBtn.disabled = true;
+            // Immediate scroll for better mobile UX
+            ui.scrollContainer.scrollTo({
+                top: ui.scrollContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
