@@ -23,6 +23,9 @@
             background-color: var(--md-sys-color-surface);
             color: var(--md-sys-color-on-surface);
             overscroll-behavior: none;
+            /* Use dvh (dynamic viewport height) to account for mobile address bars */
+            height: 100vh;
+            height: 100dvh;
         }
 
         .m3-card {
@@ -76,48 +79,58 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Ensure the main container fits the viewport perfectly */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+        }
     </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden">
+<body>
 
-    <!-- Top App Bar -->
-    <header class="px-4 py-3 flex items-center justify-between border-b border-gray-800">
-        <h1 class="text-lg font-medium tracking-tight">QBReader <span class="text-xs opacity-60 font-normal">Tossups</span></h1>
-        <button id="settingsBtn" class="p-2 rounded-full hover:bg-white/10">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        </button>
-    </header>
+    <div class="app-container">
+        <!-- Top App Bar -->
+        <header class="px-4 py-3 flex items-center justify-between border-b border-gray-800 shrink-0">
+            <h1 class="text-lg font-medium tracking-tight">QBReader <span class="text-xs opacity-60 font-normal">Tossups</span></h1>
+            <button id="settingsBtn" class="p-2 rounded-full hover:bg-white/10">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </button>
+        </header>
 
-    <!-- Main Question View -->
-    <main class="flex-grow flex flex-col p-4 overflow-hidden relative">
-        <div id="metaInfo" class="text-[10px] uppercase tracking-widest text-gray-400 mb-2 flex flex-wrap gap-2">
-            Ready to read...
-        </div>
-
-        <div id="scrollContainer" class="flex-grow overflow-y-auto pr-1">
-            <div id="questionBody" class="question-text opacity-90 transition-opacity">
-                Tap "Next" to fetch a tossup. You can filter categories and difficulty in settings.
+        <!-- Main Question View -->
+        <main class="flex-grow flex flex-col p-4 overflow-hidden relative">
+            <div id="metaInfo" class="text-[10px] uppercase tracking-widest text-gray-400 mb-2 flex flex-wrap gap-2 shrink-0">
+                Ready to read...
             </div>
 
-            <div id="answerCard" class="hidden mt-4 p-3 m3-card border-l-4 border-[#D0BCFF]">
-                <div class="text-[10px] font-bold text-[#D0BCFF] uppercase mb-1 tracking-wider">Answer</div>
-                <div id="answerText" class="text-sm italic leading-snug answer-highlight"></div>
+            <div id="scrollContainer" class="flex-grow overflow-y-auto pr-1">
+                <div id="questionBody" class="question-text opacity-90 transition-opacity">
+                    Tap "Next" to fetch a tossup. You can filter categories and difficulty in settings.
+                </div>
+
+                <div id="answerCard" class="hidden mt-4 p-3 m3-card border-l-4 border-[#D0BCFF]">
+                    <div class="text-[10px] font-bold text-[#D0BCFF] uppercase mb-1 tracking-wider">Answer</div>
+                    <div id="answerText" class="text-sm italic leading-snug answer-highlight"></div>
+                </div>
             </div>
-        </div>
 
-        <!-- Sticky Controls -->
-        <div class="mt-4 flex gap-3 pb-2">
-            <button id="revealBtn" class="flex-1 py-3 m3-btn-tonal text-sm font-medium disabled:opacity-30" disabled>
-                Reveal
-            </button>
-            <button id="nextBtn" class="flex-[2] py-3 m3-btn-primary text-sm font-medium flex items-center justify-center gap-2">
-                <span id="loader" class="loader hidden"></span>
-                <span id="nextBtnLabel">Next Tossup</span>
-            </button>
-        </div>
-    </main>
+            <!-- Sticky Controls -->
+            <div class="mt-4 flex gap-3 pb-safe shrink-0">
+                <button id="revealBtn" class="flex-1 py-4 m3-btn-tonal text-sm font-medium disabled:opacity-30" disabled>
+                    Reveal
+                </button>
+                <button id="nextBtn" class="flex-[2] py-4 m3-btn-primary text-sm font-medium flex items-center justify-center gap-2">
+                    <span id="loader" class="loader hidden"></span>
+                    <span id="nextBtnLabel">Next Tossup</span>
+                </button>
+            </div>
+        </main>
+    </div>
 
-    <!-- Settings Overlay (M3 Bottom Sheet style) -->
+    <!-- Settings Overlay -->
     <div id="settingsOverlay" class="fixed inset-0 bg-black/80 z-50 transition-opacity opacity-0 pointer-events-none">
         <div class="absolute bottom-0 left-0 right-0 m3-card rounded-b-none p-6 transform translate-y-full transition-transform duration-300 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
@@ -136,9 +149,7 @@
 
             <div class="mb-4">
                 <label class="text-sm font-medium opacity-60 block mb-3">Categories</label>
-                <div id="categoryGrid" class="grid grid-cols-2 gap-2">
-                    <!-- Categories added via JS -->
-                </div>
+                <div id="categoryGrid" class="grid grid-cols-2 gap-2"></div>
             </div>
         </div>
     </div>
@@ -168,11 +179,11 @@
             closeSettings: document.getElementById('closeSettings'),
             categoryGrid: document.getElementById('categoryGrid'),
             minDiff: document.getElementById('minDiff'),
-            maxDiff: document.getElementById('maxDiff')
+            maxDiff: document.getElementById('maxDiff'),
+            scrollContainer: document.getElementById('scrollContainer')
         };
 
         function init() {
-            // Build category chips
             categories.forEach(cat => {
                 const btn = document.createElement('button');
                 btn.className = 'py-2 px-3 m3-btn-tonal text-xs chip-active text-center transition-all truncate';
@@ -251,14 +262,13 @@
                 ui.nextBtnLabel.textContent = "Next Tossup";
                 ui.loader.classList.add('hidden');
                 ui.questionBody.style.opacity = '1';
-                document.getElementById('scrollContainer').scrollTop = 0;
+                ui.scrollContainer.scrollTop = 0;
             }
         }
 
         function revealAnswer() {
             ui.answerCard.classList.remove('hidden');
             ui.revealBtn.disabled = true;
-            // Smooth scroll to answer
             setTimeout(() => {
                 ui.answerCard.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }, 50);
